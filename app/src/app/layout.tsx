@@ -3,20 +3,16 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { AppWalletProvider } from "@/components/WalletProvider";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
-  title: "Session Counter",
-  description: "Solana session-key counter — gasless increments after one approval",
+  title: "BIREX — Peer-to-Peer Binary Trading",
+  description: "Trade binary options on crypto, forex, commodities and stocks. P2P, on-chain, no house edge.",
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" className={inter.variable}>
       <body className={inter.className}>
         <AppWalletProvider>{children}</AppWalletProvider>
       </body>

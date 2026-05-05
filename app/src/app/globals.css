@@ -3,12 +3,252 @@
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 255, 255, 255;
-  --background-rgb: 10, 10, 15;
+  --bg: #070a10;
+  --bg-card: #0d1422;
+  --bg-card2: #111826;
+  --green: #00ff88;
+  --green-dim: #00cc6a;
+  --green-dark: rgba(0, 255, 136, 0.1);
+  --red: #ff3356;
+  --red-dim: #cc1a3a;
+  --border: rgba(0, 255, 136, 0.12);
+  --border-subtle: rgba(255, 255, 255, 0.06);
+  --text-dim: rgba(255, 255, 255, 0.45);
+  --text-muted: rgba(255, 255, 255, 0.25);
 }
 
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
 body {
-  color: rgb(var(--foreground-rgb));
-  background: rgb(var(--background-rgb));
-  min-height: 100vh;
+  background: var(--bg);
+  color: white;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
 }
+
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(0,255,136,0.2); border-radius: 2px; }
+
+/* ── Glow utilities ───────────────────────────────────────────────── */
+.glow-green  { box-shadow: 0 0 20px rgba(0,255,136,0.35), 0 0 60px rgba(0,255,136,0.1); }
+.glow-red    { box-shadow: 0 0 20px rgba(255,51,86,0.35),  0 0 60px rgba(255,51,86,0.1); }
+.text-glow   { text-shadow: 0 0 30px rgba(0,255,136,0.6); }
+.text-glow-sm{ text-shadow: 0 0 15px rgba(0,255,136,0.4); }
+
+.gradient-text {
+  background: linear-gradient(135deg, #00ff88 0%, #00e5ff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Backgrounds ──────────────────────────────────────────────────── */
+.grid-bg {
+  background-image:
+    linear-gradient(rgba(0,255,136,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,255,136,0.025) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+/* ── Ticker ───────────────────────────────────────────────────────── */
+@keyframes ticker {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.ticker-wrap { overflow: hidden; }
+.ticker-inner { display: flex; width: max-content; animation: ticker 40s linear infinite; }
+.ticker-inner:hover { animation-play-state: paused; }
+
+/* ── Floats & pulses ──────────────────────────────────────────────── */
+@keyframes float-slow {
+  0%,100% { transform: translateY(0); }
+  50%      { transform: translateY(-18px); }
+}
+@keyframes float-med {
+  0%,100% { transform: translateY(0) rotate(0deg); }
+  50%      { transform: translateY(-12px) rotate(3deg); }
+}
+.float-slow { animation: float-slow 8s ease-in-out infinite; }
+.float-med  { animation: float-med  6s ease-in-out infinite; }
+
+@keyframes pulse-dot {
+  0%,100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.4; transform: scale(0.8); }
+}
+.pulse-dot { animation: pulse-dot 2s ease-in-out infinite; }
+
+@keyframes ping-ring {
+  0%   { transform: scale(1);   opacity: 0.6; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+.ping-ring { animation: ping-ring 2s ease-out infinite; }
+
+/* ── Hero entrance ────────────────────────────────────────────────── */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(32px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.fade-up-1 { animation: fade-up 0.7s ease forwards; opacity: 0; }
+.fade-up-2 { animation: fade-up 0.7s 0.15s ease forwards; opacity: 0; }
+.fade-up-3 { animation: fade-up 0.7s 0.3s  ease forwards; opacity: 0; }
+.fade-up-4 { animation: fade-up 0.7s 0.45s ease forwards; opacity: 0; }
+.fade-up-5 { animation: fade-up 0.7s 0.6s  ease forwards; opacity: 0; }
+.fade-up-6 { animation: fade-up 0.7s 0.75s ease forwards; opacity: 0; }
+
+/* ── Scanline ─────────────────────────────────────────────────────── */
+@keyframes scanline {
+  0%   { transform: translateY(-100%); opacity: 0.6; }
+  100% { transform: translateY(100vh); opacity: 0; }
+}
+.scanline-anim {
+  position: absolute; left: 0; right: 0; height: 2px; pointer-events: none;
+  background: linear-gradient(90deg, transparent 0%, rgba(0,255,136,0.4) 50%, transparent 100%);
+  animation: scanline 5s linear infinite;
+}
+
+/* ── Trading buttons ──────────────────────────────────────────────── */
+.btn-up {
+  background: linear-gradient(135deg, #00ff88 0%, #00cc6a 100%);
+  color: #070a10;
+  font-weight: 800;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.btn-up:hover  { transform: translateY(-2px); box-shadow: 0 10px 40px rgba(0,255,136,0.45); }
+.btn-up:active { transform: translateY(0);    box-shadow: 0 4px  20px rgba(0,255,136,0.3);  }
+
+.btn-down {
+  background: linear-gradient(135deg, #ff3356 0%, #cc1a3a 100%);
+  color: #fff;
+  font-weight: 800;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.btn-down:hover  { transform: translateY(-2px); box-shadow: 0 10px 40px rgba(255,51,86,0.45); }
+.btn-down:active { transform: translateY(0);    box-shadow: 0 4px  20px rgba(255,51,86,0.3);  }
+
+/* ── Price flash ──────────────────────────────────────────────────── */
+@keyframes flash-up {
+  0%,100% { color: inherit; }
+  40%     { color: #00ff88; }
+}
+@keyframes flash-down {
+  0%,100% { color: inherit; }
+  40%     { color: #ff3356; }
+}
+.flash-up   { animation: flash-up   0.6s ease; }
+.flash-down { animation: flash-down 0.6s ease; }
+
+/* ── Slide in ─────────────────────────────────────────────────────── */
+@keyframes slide-right {
+  from { opacity: 0; transform: translateX(24px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+.slide-right { animation: slide-right 0.35s ease; }
+
+/* ── Card styles ──────────────────────────────────────────────────── */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+}
+.card-green-border {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+/* ── Duration pill ────────────────────────────────────────────────── */
+.duration-pill {
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: transparent;
+  color: rgba(255,255,255,0.5);
+  transition: all 0.15s;
+}
+.duration-pill:hover  { border-color: rgba(0,255,136,0.4); color: #00ff88; }
+.duration-pill.active {
+  background: rgba(0,255,136,0.12);
+  border-color: rgba(0,255,136,0.5);
+  color: #00ff88;
+  box-shadow: 0 0 12px rgba(0,255,136,0.15);
+}
+
+/* ── Asset row ────────────────────────────────────────────────────── */
+.asset-row {
+  padding: 10px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s;
+  border: 1px solid transparent;
+}
+.asset-row:hover  { background: rgba(255,255,255,0.04); }
+.asset-row.active {
+  background: rgba(0,255,136,0.06);
+  border-color: rgba(0,255,136,0.2);
+}
+
+/* ── Wallet button override ───────────────────────────────────────── */
+.wallet-adapter-button {
+  background: linear-gradient(135deg, #00ff88, #00cc6a) !important;
+  color: #070a10 !important;
+  font-weight: 800 !important;
+  border-radius: 10px !important;
+  font-size: 14px !important;
+  height: auto !important;
+  padding: 10px 22px !important;
+  transition: transform 0.15s, box-shadow 0.15s !important;
+}
+.wallet-adapter-button:hover {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 8px 30px rgba(0,255,136,0.4) !important;
+  background: linear-gradient(135deg, #00ff88, #00cc6a) !important;
+}
+.wallet-adapter-button-trigger {
+  background: linear-gradient(135deg, #00ff88, #00cc6a) !important;
+}
+
+/* ── Countdown ring ───────────────────────────────────────────────── */
+@keyframes dash {
+  to { stroke-dashoffset: 0; }
+}
+
+/* ── Number counter ───────────────────────────────────────────────── */
+@keyframes num-pop {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+.num-pop { animation: num-pop 0.3s ease; }
+
+/* ── Notification toast ───────────────────────────────────────────── */
+@keyframes toast-in {
+  from { transform: translateX(120%); opacity: 0; }
+  to   { transform: translateX(0);    opacity: 1; }
+}
+@keyframes toast-out {
+  from { transform: translateX(0);    opacity: 1; }
+  to   { transform: translateX(120%); opacity: 0; }
+}
+.toast-in  { animation: toast-in  0.4s cubic-bezier(0.34,1.56,0.64,1) forwards; }
+.toast-out { animation: toast-out 0.3s ease forwards; }
+
+/* ── Confetti-like win glow ───────────────────────────────────────── */
+@keyframes win-glow {
+  0%   { box-shadow: 0 0 0 0 rgba(0,255,136,0); }
+  40%  { box-shadow: 0 0 60px 20px rgba(0,255,136,0.3); }
+  100% { box-shadow: 0 0 0 0 rgba(0,255,136,0); }
+}
+.win-glow { animation: win-glow 0.8s ease; }
