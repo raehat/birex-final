@@ -1,0 +1,18 @@
+# Rust / Anchor
+target/
+test-ledger/
+
+# Node / Next.js
+app/node_modules/
+app/.next/
+app/out/
+app/.env
+app/.env.local
+app/.env.*.local
+
+# Anchor build artifacts
+.anchor/
+
+# OS
+.DS_Store
+Thumbs.db
