@@ -1,6 +1,6 @@
 'use client';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 interface Props {
   onLogoClick?: () => void;
@@ -10,6 +10,9 @@ export default function Navbar({ onLogoClick }: Props) {
   const [volume, setVolume] = useState(3_284_710);
   const [trades, setTrades] = useState(1_847);
   const [blink, setBlink] = useState(true);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => { setMounted(true); }, []);
 
   useEffect(() => {
     const id = setInterval(() => {
@@ -75,7 +78,7 @@ export default function Navbar({ onLogoClick }: Props) {
           </div>
         </div>
 
-        <WalletMultiButton />
+        {mounted && <WalletMultiButton />}
       </div>
     </nav>
   );

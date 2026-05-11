@@ -27,6 +27,9 @@ export default function Hero({ onEnter }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { connected } = useWallet();
   const [entered, setEntered] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => { setMounted(true); }, []);
 
   useEffect(() => {
     if (connected && !entered) {
@@ -217,7 +220,7 @@ export default function Hero({ onEnter }: Props) {
 
         {/* CTA */}
         <div className="fade-up-6 flex flex-col items-center gap-4">
-          <WalletMultiButton />
+          {mounted && <WalletMultiButton />}
           {connected && (
             <button onClick={onEnter}
                     className="text-sm font-semibold underline underline-offset-4"
