@@ -1,6 +1,14 @@
 'use client';
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback, useState } from 'react';
 import { Asset } from '@/lib/assets';
+
+const POLL_MS = 400;
+const ZOOM_OPTIONS = [
+  { label: '30s', points: 75  },
+  { label: '1m',  points: 150 },
+  { label: '2m',  points: 300 },
+  { label: '4m',  points: 600 },
+];
 
 interface Props {
   asset: Asset;
@@ -14,6 +22,8 @@ export default function LiveChart({ asset, history, currentPrice, activeBet }: P
   const rafRef = useRef<number>(0);
   const animPriceRef = useRef<number | null>(null);
   const targetPriceRef = useRef<number | null>(null);
+  const [viewPoints, setViewPoints] = useState(150);
+  const viewPointsRef = useRef(viewPoints);
 
   const historyRef = useRef(history);
   const assetRef = useRef(asset);
@@ -22,6 +32,7 @@ export default function LiveChart({ asset, history, currentPrice, activeBet }: P
   useEffect(() => { historyRef.current = history; }, [history]);
   useEffect(() => { assetRef.current = asset; }, [asset]);
   useEffect(() => { activeBetRef.current = activeBet; }, [activeBet]);
+  useEffect(() => { viewPointsRef.current = viewPoints; }, [viewPoints]);
 
   useEffect(() => {
     if (currentPrice == null) return;
@@ -37,6 +48,7 @@ export default function LiveChart({ asset, history, currentPrice, activeBet }: P
     const h = historyRef.current;
     const ast = assetRef.current;
     const ab = activeBetRef.current;
+    const vc = viewPointsRef.current;
 
     if (ap == null || h.length === 0) {
       const ctx = canvas.getContext('2d');
@@ -54,12 +66,11 @@ export default function LiveChart({ asset, history, currentPrice, activeBet }: P
     canvas.height = H * dpr;
     ctx.scale(dpr, dpr);
 
-    const PAD_L = 10, PAD_R = 64, PAD_T = 20, PAD_B = 32;
+    const PAD_L = 10, PAD_R = 64, PAD_T = 20, PAD_B = 44;
     const chartW = W - PAD_L - PAD_R;
     const chartH = H - PAD_T - PAD_B;
 
-    // Replace last history point with animated price for smooth line tip
-    const data = h.filter(Boolean);
+    const data = h.filter(Boolean).slice(-vc);
     if (data.length < 2) return;
     data[data.length - 1] = ap;
 
@@ -76,17 +87,37 @@ export default function LiveChart({ asset, history, currentPrice, activeBet }: P
 
     ctx.clearRect(0, 0, W, H);
 
-    /* ── Grid ── */
+    /* ── Horizontal grid + Y labels ── */
     ctx.strokeStyle = 'rgba(255,255,255,0.04)';
     ctx.lineWidth = 1;
     for (let r = 0; r <= 4; r++) {
       const y = PAD_T + (r / 4) * chartH;
       ctx.beginPath(); ctx.moveTo(PAD_L, y); ctx.lineTo(W - PAD_R, y); ctx.stroke();
-      const label = (max - (r / 4) * range).toFixed(ast.decimals);
       ctx.fillStyle = 'rgba(255,255,255,0.25)';
       ctx.font = '10px monospace';
       ctx.textAlign = 'left';
-      ctx.fillText(label, W - PAD_R + 6, y + 4);
+      ctx.fillText((max - (r / 4) * range).toFixed(ast.decimals), W - PAD_R + 6, y + 4);
+    }
+
+    /* ── X-axis time labels + vertical grid ── */
+    const now = Date.now();
+    const numLabels = 5;
+    ctx.font = '10px monospace';
+    ctx.fillStyle = 'rgba(255,255,255,0.25)';
+    ctx.textAlign = 'center';
+    for (let t = 0; t < numLabels; t++) {
+      const frac = t / (numLabels - 1);
+      const dataIdx = Math.round(frac * (data.length - 1));
+      const x = toX(dataIdx);
+      const msAgo = (data.length - 1 - dataIdx) * POLL_MS;
+      const ts = new Date(now - msAgo);
+      const label = ts.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      // vertical grid line
+      ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+      ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(x, PAD_T); ctx.lineTo(x, PAD_T + chartH); ctx.stroke();
+      ctx.fillStyle = 'rgba(255,255,255,0.25)';
+      ctx.fillText(label, x, PAD_T + chartH + 18);
     }
 
     /* ── Entry price line ── */
@@ -187,6 +218,25 @@ export default function LiveChart({ asset, history, currentPrice, activeBet }: P
   return (
     <div className="relative w-full h-full">
       <canvas ref={canvasRef} className="w-full h-full" style={{ display: 'block' }} />
+
+      {/* Zoom controls */}
+      <div className="absolute top-2 left-3 flex gap-1">
+        {ZOOM_OPTIONS.map(opt => (
+          <button
+            key={opt.label}
+            onClick={() => setViewPoints(opt.points)}
+            className="px-2 py-0.5 rounded text-xs font-mono font-semibold transition-all"
+            style={{
+              background: viewPoints === opt.points ? 'rgba(0,255,136,0.15)' : 'rgba(255,255,255,0.04)',
+              color: viewPoints === opt.points ? '#00ff88' : 'rgba(255,255,255,0.3)',
+              border: viewPoints === opt.points ? '1px solid rgba(0,255,136,0.3)' : '1px solid rgba(255,255,255,0.06)',
+            }}
+          >
+            {opt.label}
+          </button>
+        ))}
+      </div>
+
       {(currentPrice == null || history.length === 0) && (
         <div className="absolute inset-0 flex items-center justify-center">
           <span className="text-sm font-mono" style={{ color: 'rgba(255,255,255,0.3)' }}>
