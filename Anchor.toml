@@ -4,11 +4,9 @@
 resolution = true
 skip-lint = false
 
-[programs.devnet]
-session_counter = "7hn53ddxnm63KhxWaka9QPA8bjyMrAz9JnbZoy1UCCJ3"
-
 [programs.localnet]
-session_counter = "4ppdMWYwx6PVH3W25vC8xpstzxYhQnGQL766TA6TWjCW"
+bt_token = "2Jts3AVjULjhJBsQBWHCQCRpZ4F9PX3odewcbN4hKrXi"
+birex_core = "BRXCor1111111111111111111111111111111111111"
 
 [provider]
 cluster = "localnet"

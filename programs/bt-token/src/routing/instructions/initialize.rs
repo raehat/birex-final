@@ -41,9 +41,11 @@ pub struct Initialize<'info> {
 
 pub fn handler(ctx: Context<Initialize>, bt_decimals: u8) -> Result<()> {
     let state = &mut ctx.accounts.state;
+    state.admin = ctx.accounts.authority.key();
     state.bt_mint = ctx.accounts.bt_mint.key();
     state.usdc_mint = ctx.accounts.usdc_mint.key();
     state.vault = ctx.accounts.vault.key();
+    state.authorized_minter = Pubkey::default();
     state.corpus = 0;
     state.total_bt_minted = 0;
     state.bump = ctx.bumps.state;

@@ -1,6 +1,13 @@
 use anchor_lang::prelude::*;
 
 #[event]
+pub struct ProtocolMintEvent {
+    pub recipient: Pubkey,
+    pub amount: u64,
+    pub total_bt_after: u64,
+}
+
+#[event]
 pub struct MintEvent {
     pub user: Pubkey,
     pub usdc_in: u64,

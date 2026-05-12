@@ -16,4 +16,8 @@ pub enum BtError {
     WrongVault,
     #[msg("Wrong token account owner")]
     WrongOwner,
+    #[msg("Caller is not the authorized minter")]
+    Unauthorized,
+    #[msg("Authorized minter is not set")]
+    MinterNotSet,
 }
