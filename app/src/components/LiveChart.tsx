@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 import { Asset } from '@/lib/assets';
 
 interface Props {
@@ -11,24 +11,46 @@ interface Props {
 
 export default function LiveChart({ asset, history, currentPrice, activeBet }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const rafRef = useRef<number>(0);
+  const animPriceRef = useRef<number | null>(null);
+  const targetPriceRef = useRef<number | null>(null);
+
+  const historyRef = useRef(history);
+  const assetRef = useRef(asset);
+  const activeBetRef = useRef(activeBet);
+
+  useEffect(() => { historyRef.current = history; }, [history]);
+  useEffect(() => { assetRef.current = asset; }, [asset]);
+  useEffect(() => { activeBetRef.current = activeBet; }, [activeBet]);
 
   useEffect(() => {
+    if (currentPrice == null) return;
+    targetPriceRef.current = currentPrice;
+    if (animPriceRef.current == null) animPriceRef.current = currentPrice;
+  }, [currentPrice]);
+
+  const drawFrame = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    if (currentPrice == null || history.length === 0) {
+
+    const ap = animPriceRef.current;
+    const h = historyRef.current;
+    const ast = assetRef.current;
+    const ab = activeBetRef.current;
+
+    if (ap == null || h.length === 0) {
       const ctx = canvas.getContext('2d');
-      if (ctx) {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-      }
+      if (ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
       return;
     }
+
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
     const dpr = window.devicePixelRatio || 1;
     const W = canvas.offsetWidth;
     const H = canvas.offsetHeight;
-    canvas.width  = W * dpr;
+    canvas.width = W * dpr;
     canvas.height = H * dpr;
     ctx.scale(dpr, dpr);
 
@@ -36,8 +58,10 @@ export default function LiveChart({ asset, history, currentPrice, activeBet }: P
     const chartW = W - PAD_L - PAD_R;
     const chartH = H - PAD_T - PAD_B;
 
-    const data = history.filter(Boolean);
+    // Replace last history point with animated price for smooth line tip
+    const data = h.filter(Boolean);
     if (data.length < 2) return;
+    data[data.length - 1] = ap;
 
     const rawMin = Math.min(...data);
     const rawMax = Math.max(...data);
@@ -58,7 +82,7 @@ export default function LiveChart({ asset, history, currentPrice, activeBet }: P
     for (let r = 0; r <= 4; r++) {
       const y = PAD_T + (r / 4) * chartH;
       ctx.beginPath(); ctx.moveTo(PAD_L, y); ctx.lineTo(W - PAD_R, y); ctx.stroke();
-      const label = (max - (r / 4) * range).toFixed(asset.decimals);
+      const label = (max - (r / 4) * range).toFixed(ast.decimals);
       ctx.fillStyle = 'rgba(255,255,255,0.25)';
       ctx.font = '10px monospace';
       ctx.textAlign = 'left';
@@ -66,15 +90,15 @@ export default function LiveChart({ asset, history, currentPrice, activeBet }: P
     }
 
     /* ── Entry price line ── */
-    if (activeBet) {
-      const ey = toY(activeBet.entryPrice);
+    if (ab) {
+      const ey = toY(ab.entryPrice);
       ctx.setLineDash([5, 5]);
-      ctx.strokeStyle = activeBet.direction === 'up' ? 'rgba(0,255,136,0.5)' : 'rgba(255,51,86,0.5)';
+      ctx.strokeStyle = ab.direction === 'up' ? 'rgba(0,255,136,0.5)' : 'rgba(255,51,86,0.5)';
       ctx.lineWidth = 1.2;
       ctx.beginPath(); ctx.moveTo(PAD_L, ey); ctx.lineTo(W - PAD_R, ey); ctx.stroke();
       ctx.setLineDash([]);
       ctx.font = '9px monospace';
-      ctx.fillStyle = activeBet.direction === 'up' ? '#00ff88' : '#ff3356';
+      ctx.fillStyle = ab.direction === 'up' ? '#00ff88' : '#ff3356';
       ctx.textAlign = 'left';
       ctx.fillText('ENTRY', W - PAD_R + 6, ey - 2);
     }
@@ -117,13 +141,11 @@ export default function LiveChart({ asset, history, currentPrice, activeBet }: P
 
     /* ── Current price dot ── */
     const lastX = toX(data.length - 1);
-    const lastY = toY(currentPrice);
-    // ping ring
+    const lastY = toY(ap);
     ctx.beginPath();
     ctx.arc(lastX, lastY, 7, 0, Math.PI * 2);
     ctx.fillStyle = 'rgba(0,255,136,0.15)';
     ctx.fill();
-    // dot
     ctx.shadowColor = '#00ff88';
     ctx.shadowBlur  = 12;
     ctx.beginPath();
@@ -133,7 +155,7 @@ export default function LiveChart({ asset, history, currentPrice, activeBet }: P
     ctx.shadowBlur = 0;
 
     /* ── Current price label ── */
-    const pLabel = currentPrice.toFixed(asset.decimals);
+    const pLabel = ap.toFixed(ast.decimals);
     const labelW = ctx.measureText(pLabel).width + 14;
     const labelH = 20;
     const lx = W - PAD_R + 6;
@@ -146,8 +168,21 @@ export default function LiveChart({ asset, history, currentPrice, activeBet }: P
     ctx.font = 'bold 10px monospace';
     ctx.textAlign = 'left';
     ctx.fillText(pLabel, lx + 7, ly + 13);
+  }, []);
 
-  }, [history, currentPrice, asset, activeBet]);
+  /* ── 60fps rAF loop with lerp ── */
+  useEffect(() => {
+    const LERP = 0.12;
+    const loop = () => {
+      if (targetPriceRef.current != null && animPriceRef.current != null) {
+        animPriceRef.current += (targetPriceRef.current - animPriceRef.current) * LERP;
+        drawFrame();
+      }
+      rafRef.current = requestAnimationFrame(loop);
+    };
+    rafRef.current = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(rafRef.current);
+  }, [drawFrame]);
 
   return (
     <div className="relative w-full h-full">

@@ -5,7 +5,7 @@ import { ASSETS, Asset } from '@/lib/assets';
 export type PriceMap = Record<string, number>;
 export type HistoryMap = Record<string, number[]>;
 
-const HISTORY_LEN = 60;
+const HISTORY_LEN = 240;
 const HERMES_URL = 'https://hermes.pyth.network/v2/updates/price/latest';
 const POLL_MS = 400;
 
