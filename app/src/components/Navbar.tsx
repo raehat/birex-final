@@ -1,6 +1,5 @@
 'use client';
-import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 
 interface Props {
   onLogoClick?: () => void;
@@ -10,10 +9,6 @@ export default function Navbar({ onLogoClick }: Props) {
   const [volume, setVolume] = useState(3_284_710);
   const [trades, setTrades] = useState(1_847);
   const [blink, setBlink] = useState(true);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => { setMounted(true); }, []);
-
   useEffect(() => {
     const id = setInterval(() => {
       setVolume(v => v + Math.floor(Math.random() * 2400 + 600));
@@ -56,18 +51,6 @@ export default function Navbar({ onLogoClick }: Props) {
       <div className="flex items-center gap-5">
         {/* Live stats */}
         <div className="hidden lg:flex items-center gap-5 text-xs">
-          <div>
-            <span style={{ color: 'rgba(255,255,255,0.35)' }}>Vol 24h&nbsp;</span>
-            <span className="font-mono font-bold" style={{ color: '#00ff88' }}>
-              ${(volume / 1_000_000).toFixed(2)}M
-            </span>
-          </div>
-          <div>
-            <span style={{ color: 'rgba(255,255,255,0.35)' }}>Trades&nbsp;</span>
-            <span className="font-mono font-bold" style={{ color: '#00ff88' }}>
-              {trades.toLocaleString()}
-            </span>
-          </div>
           <div className="flex items-center gap-1.5">
             <div className="relative w-2 h-2">
               <div className="absolute inset-0 rounded-full ping-ring"
@@ -78,7 +61,19 @@ export default function Navbar({ onLogoClick }: Props) {
           </div>
         </div>
 
-        {mounted && <WalletMultiButton />}
+        <a
+          href="https://forms.gle/ZN9wFEC91TuhEJAv5"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="px-4 py-2 rounded-lg text-sm font-bold transition-all"
+          style={{
+            background: 'rgba(0,255,136,0.12)',
+            border: '1px solid rgba(0,255,136,0.35)',
+            color: '#00ff88',
+          }}
+        >
+          Join Waitlist
+        </a>
       </div>
     </nav>
   );

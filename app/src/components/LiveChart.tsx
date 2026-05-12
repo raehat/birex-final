@@ -30,7 +30,12 @@ export default function LiveChart({ asset, history, currentPrice, activeBet }: P
   const activeBetRef = useRef(activeBet);
 
   useEffect(() => { historyRef.current = history; }, [history]);
-  useEffect(() => { assetRef.current = asset; }, [asset]);
+  useEffect(() => {
+    assetRef.current = asset;
+    // reset animation when asset changes so we don't lerp from wrong price
+    animPriceRef.current = null;
+    targetPriceRef.current = null;
+  }, [asset]);
   useEffect(() => { activeBetRef.current = activeBet; }, [activeBet]);
   useEffect(() => { viewPointsRef.current = viewPoints; }, [viewPoints]);
 

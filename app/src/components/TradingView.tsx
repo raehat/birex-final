@@ -1,5 +1,5 @@
 'use client';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { ASSETS, Asset } from '@/lib/assets';
 import { usePrices } from '@/hooks/usePrices';
 import Navbar from './Navbar';
@@ -19,17 +19,25 @@ interface ActiveBet {
 
 interface Props {
   onBackToHero: () => void;
+  isDemo: boolean;
 }
 
-export default function TradingView({ onBackToHero }: Props) {
+const DEMO_START_BALANCE = 10_000;
+
+export default function TradingView({ onBackToHero, isDemo }: Props) {
   const [selectedAsset, setSelectedAsset] = useState<Asset>(ASSETS[0]);
   const [activeBet, setActiveBet] = useState<ActiveBet | null>(null);
+  const [demoBalance, setDemoBalance] = useState(DEMO_START_BALANCE);
   const { prices, history, pctChange, direction } = usePrices();
 
   const currentPrice = prices[selectedAsset.id];
   const currentHistory = history[selectedAsset.id] ?? [];
   const pct = pctChange(selectedAsset);
   const dir = direction(selectedAsset.id);
+
+  // Keep a ref to current price so setTimeout closures can read the latest value
+  const currentPriceRef = useRef(currentPrice);
+  useEffect(() => { currentPriceRef.current = currentPrice; }, [currentPrice]);
 
   const handleBet = useCallback((betDir: 'up' | 'down', amount: number, durationSeconds: number) => {
     const entryPrice = prices[selectedAsset.id];
@@ -41,8 +49,17 @@ export default function TradingView({ onBackToHero }: Props) {
       amount,
       asset: selectedAsset,
     });
-    setTimeout(() => setActiveBet(null), durationSeconds * 1000 + 500);
-  }, [prices, selectedAsset]);
+    setTimeout(() => {
+      if (isDemo) {
+        const closing = currentPriceRef.current;
+        if (closing != null) {
+          const won = betDir === 'up' ? closing > entryPrice : closing < entryPrice;
+          setDemoBalance(prev => won ? prev + amount * 0.95 : prev - amount);
+        }
+      }
+      setActiveBet(null);
+    }, durationSeconds * 1000 + 500);
+  }, [prices, selectedAsset, isDemo]);
 
   const handleSelectAsset = useCallback((a: Asset) => {
     if (activeBet) return;
@@ -53,8 +70,26 @@ export default function TradingView({ onBackToHero }: Props) {
     <div className="flex flex-col h-screen overflow-hidden" style={{ background: 'var(--bg)' }}>
       <Navbar onLogoClick={onBackToHero} />
 
+      {/* Demo banner */}
+      {isDemo && (
+        <div className="fixed top-14 left-0 right-0 z-40 flex items-center justify-center gap-3 px-4 py-1.5 text-xs font-bold"
+             style={{ background: 'rgba(255,180,0,0.12)', borderBottom: '1px solid rgba(255,180,0,0.25)', color: '#ffb400' }}>
+          <span className="px-2 py-0.5 rounded font-black tracking-wider" style={{ background: 'rgba(255,180,0,0.2)' }}>DEMO</span>
+          <span>Balance:</span>
+          <span className="font-mono text-sm">{demoBalance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} BT</span>
+          {demoBalance < 10 && (
+            <button onClick={() => setDemoBalance(DEMO_START_BALANCE)}
+                    className="ml-2 px-3 py-0.5 rounded font-bold text-xs"
+                    style={{ background: 'rgba(255,180,0,0.3)', border: '1px solid rgba(255,180,0,0.5)' }}>
+              Refill $10,000
+            </button>
+          )}
+          <span style={{ color: 'rgba(255,180,0,0.5)' }}>· Virtual funds only</span>
+        </div>
+      )}
+
       {/* Ticker */}
-      <div className="mt-14">
+      <div className={isDemo ? 'mt-[calc(3.5rem+32px)]' : 'mt-14'}>
         <MarketTicker prices={prices} pctChange={pctChange} />
       </div>
 
@@ -86,7 +121,6 @@ export default function TradingView({ onBackToHero }: Props) {
                 <div className="font-black text-base">{selectedAsset.symbol}</div>
                 <div className="text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>{selectedAsset.name}</div>
               </div>
-              {/* Category badge */}
               <span className="px-2 py-0.5 rounded text-xs font-semibold capitalize"
                     style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.4)' }}>
                 {selectedAsset.category}
@@ -123,7 +157,7 @@ export default function TradingView({ onBackToHero }: Props) {
           {/* Bottom stats bar */}
           <div className="flex items-center gap-6 px-5 py-2.5 shrink-0"
                style={{ borderTop: '1px solid var(--border-subtle)', background: 'rgba(13,20,34,0.5)' }}>
-            {[
+            {currentPrice != null && [
               { label: '24h High', value: (currentPrice * 1.028).toFixed(selectedAsset.decimals) },
               { label: '24h Low',  value: (currentPrice * 0.972).toFixed(selectedAsset.decimals) },
               { label: '24h Vol',  value: '$' + (Math.random() * 900 + 100).toFixed(0) + 'M' },
@@ -144,16 +178,16 @@ export default function TradingView({ onBackToHero }: Props) {
         {/* Right column */}
         <div className="flex flex-col w-72 shrink-0 border-l overflow-hidden"
              style={{ borderColor: 'var(--border-subtle)' }}>
-          {/* Trading panel — top ~60% */}
           <div className="shrink-0 border-b overflow-y-auto" style={{ borderColor: 'var(--border-subtle)', maxHeight: '65%' }}>
             <TradingPanel
               asset={selectedAsset}
               currentPrice={currentPrice}
               onBet={handleBet}
               activeBet={activeBet}
+              isDemo={isDemo}
+              demoBalance={isDemo ? demoBalance : undefined}
             />
           </div>
-          {/* Recent trades — bottom ~40% */}
           <div className="flex-1 overflow-hidden">
             <RecentTrades />
           </div>

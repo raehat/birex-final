@@ -1,10 +1,8 @@
 'use client';
-import { useEffect, useRef, useState } from 'react';
-import { useWallet } from '@solana/wallet-adapter-react';
-import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
+import { useEffect, useRef } from 'react';
 
 interface Props {
-  onEnter: () => void;
+  onDemo: () => void;
 }
 
 const STATS = [
@@ -23,20 +21,8 @@ const FLOATING_ASSETS = [
   { symbol: 'OIL', color: '#8b6914', x: '90%', y: '45%', delay: 3 },
 ];
 
-export default function Hero({ onEnter }: Props) {
+export default function Hero({ onDemo }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const { connected } = useWallet();
-  const [entered, setEntered] = useState(false);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => { setMounted(true); }, []);
-
-  useEffect(() => {
-    if (connected && !entered) {
-      const t = setTimeout(() => { setEntered(true); onEnter(); }, 600);
-      return () => clearTimeout(t);
-    }
-  }, [connected, entered, onEnter]);
 
   /* Canvas particle network */
   useEffect(() => {
@@ -219,19 +205,35 @@ export default function Hero({ onEnter }: Props) {
 
         {/* CTA */}
         <div className="fade-up-6 flex flex-col items-center gap-4">
-          {mounted && <WalletMultiButton />}
-          {connected && (
-            <button onClick={onEnter}
-                    className="text-sm font-semibold underline underline-offset-4"
-                    style={{ color: '#00ff88' }}>
-              Enter Trading Platform →
+          <div className="flex flex-col sm:flex-row items-center gap-3">
+            <a
+              href="https://forms.gle/ZN9wFEC91TuhEJAv5"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-7 py-3 rounded-lg font-bold text-sm transition-all"
+              style={{
+                background: 'rgba(0,255,136,0.12)',
+                border: '1px solid rgba(0,255,136,0.35)',
+                color: '#00ff88',
+              }}
+            >
+              Join Waitlist
+            </a>
+            <button
+              onClick={onDemo}
+              className="px-7 py-3 rounded-lg font-bold text-sm transition-all"
+              style={{
+                background: 'rgba(255,255,255,0.06)',
+                border: '1px solid rgba(255,255,255,0.15)',
+                color: 'rgba(255,255,255,0.8)',
+              }}
+            >
+              Try Demo
             </button>
-          )}
-          {!connected && (
-            <p className="text-xs" style={{ color: 'rgba(255,255,255,0.25)' }}>
-              Connect your Solana wallet to start trading
-            </p>
-          )}
+          </div>
+          <p className="text-xs" style={{ color: 'rgba(255,255,255,0.25)' }}>
+            Join the waitlist to trade live · Try demo with no wallet
+          </p>
         </div>
       </div>
 

@@ -15,9 +15,11 @@ interface Props {
   currentPrice: number | undefined;
   onBet: (direction: 'up' | 'down', amount: number, durationSeconds: number) => void;
   activeBet: ActiveBet | null;
+  isDemo?: boolean;
+  demoBalance?: number;
 }
 
-export default function TradingPanel({ asset, currentPrice, onBet, activeBet }: Props) {
+export default function TradingPanel({ asset, currentPrice, onBet, activeBet, isDemo, demoBalance }: Props) {
   const [duration, setDuration]   = useState(30);
   const [amount, setAmount]       = useState('50');
   const [countdown, setCountdown] = useState<number | null>(null);
@@ -49,16 +51,12 @@ export default function TradingPanel({ asset, currentPrice, onBet, activeBet }: 
 
   const handleBet = (direction: 'up' | 'down') => {
     if (activeBet || amountNum <= 0) return;
+    if (isDemo && demoBalance != null && amountNum > demoBalance) return;
     setResult(null);
     onBet(direction, amountNum, duration);
   };
 
-  const progress = activeBet
-    ? 1 - (countdown ?? 0) / ((activeBet.expiresAt - (activeBet.expiresAt - duration * 1000)) / 1000)
-    : 0;
-
   const circumference = 2 * Math.PI * 28;
-  const timerDuration = activeBet ? (activeBet.expiresAt - Date.now() + (countdown ?? 0) * 1000) / 1000 : duration;
   const dashOffset = activeBet && countdown !== null
     ? circumference * (countdown / (duration))
     : circumference;
@@ -85,6 +83,16 @@ export default function TradingPanel({ asset, currentPrice, onBet, activeBet }: 
           <div className="text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>Current Price</div>
         </div>
       </div>
+
+      {isDemo && demoBalance != null && (
+        <div className="rounded-lg px-3 py-2 flex items-center justify-between"
+             style={{ background: 'rgba(255,180,0,0.07)', border: '1px solid rgba(255,180,0,0.2)' }}>
+          <span className="text-xs font-bold tracking-widest" style={{ color: 'rgba(255,180,0,0.7)' }}>DEMO BALANCE</span>
+          <span className="font-mono font-black text-sm" style={{ color: '#ffb400' }}>
+            {demoBalance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} BT
+          </span>
+        </div>
+      )}
 
       <div style={{ borderTop: '1px solid var(--border-subtle)' }} />
 
