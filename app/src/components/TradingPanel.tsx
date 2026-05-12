@@ -12,7 +12,7 @@ interface ActiveBet {
 
 interface Props {
   asset: Asset;
-  currentPrice: number;
+  currentPrice: number | undefined;
   onBet: (direction: 'up' | 'down', amount: number, durationSeconds: number) => void;
   activeBet: ActiveBet | null;
 }
@@ -36,9 +36,9 @@ export default function TradingPanel({ asset, currentPrice, onBet, activeBet }: 
       setCountdown(remaining);
       if (remaining === 0) {
         clearInterval(id);
-        const won = activeBet.direction === 'up'
+        const won = currentPrice != null && (activeBet.direction === 'up'
           ? currentPrice > activeBet.entryPrice
-          : currentPrice < activeBet.entryPrice;
+          : currentPrice < activeBet.entryPrice);
         setResult(won ? 'win' : 'loss');
         setResultVisible(true);
         setTimeout(() => setResultVisible(false), 3500);
@@ -80,7 +80,7 @@ export default function TradingPanel({ asset, currentPrice, onBet, activeBet }: 
         </div>
         <div className="text-right">
           <div className="font-mono font-bold text-lg" style={{ color: '#00ff88' }}>
-            {currentPrice.toFixed(asset.decimals)}
+            {currentPrice != null ? currentPrice.toFixed(asset.decimals) : '—'}
           </div>
           <div className="text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>Current Price</div>
         </div>
@@ -192,7 +192,7 @@ export default function TradingPanel({ asset, currentPrice, onBet, activeBet }: 
           <div className="text-xs text-center" style={{ color: 'rgba(255,255,255,0.35)' }}>
             Entry: {activeBet.entryPrice.toFixed(asset.decimals)}
             <br />
-            Current: {currentPrice.toFixed(asset.decimals)}
+            Current: {currentPrice != null ? currentPrice.toFixed(asset.decimals) : '—'}
           </div>
         </div>
       ) : (

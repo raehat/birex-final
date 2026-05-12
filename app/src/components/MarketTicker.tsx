@@ -18,7 +18,7 @@ export default function MarketTicker({ prices, pctChange }: Props) {
     }}>
       <div className="ticker-inner py-2">
         {items.map((asset, i) => {
-          const price = prices[asset.id] ?? asset.basePrice;
+          const price = prices[asset.id];
           const pct = pctChange(asset);
           const up = pct >= 0;
           return (
@@ -28,10 +28,10 @@ export default function MarketTicker({ prices, pctChange }: Props) {
                 {asset.symbol}
               </span>
               <span className="text-xs font-mono font-semibold text-white">
-                {price.toFixed(asset.decimals)}
+                {price != null ? price.toFixed(asset.decimals) : '—'}
               </span>
               <span className="text-xs font-mono font-bold" style={{ color: up ? '#00ff88' : '#ff3356' }}>
-                {up ? '+' : ''}{pct.toFixed(2)}%
+                {price != null ? `${up ? '+' : ''}${pct.toFixed(2)}%` : '—'}
               </span>
             </div>
           );

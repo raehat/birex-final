@@ -24,17 +24,19 @@ interface Props {
 export default function TradingView({ onBackToHero }: Props) {
   const [selectedAsset, setSelectedAsset] = useState<Asset>(ASSETS[0]);
   const [activeBet, setActiveBet] = useState<ActiveBet | null>(null);
-  const { prices, history, pctChange, direction } = usePrices(400);
+  const { prices, history, pctChange, direction } = usePrices();
 
-  const currentPrice = prices[selectedAsset.id] ?? selectedAsset.basePrice;
+  const currentPrice = prices[selectedAsset.id];
   const currentHistory = history[selectedAsset.id] ?? [];
   const pct = pctChange(selectedAsset);
   const dir = direction(selectedAsset.id);
 
   const handleBet = useCallback((betDir: 'up' | 'down', amount: number, durationSeconds: number) => {
+    const entryPrice = prices[selectedAsset.id];
+    if (entryPrice == null) return;
     setActiveBet({
       direction: betDir,
-      entryPrice: prices[selectedAsset.id] ?? selectedAsset.basePrice,
+      entryPrice,
       expiresAt: Date.now() + durationSeconds * 1000,
       amount,
       asset: selectedAsset,
@@ -94,11 +96,11 @@ export default function TradingView({ onBackToHero }: Props) {
               <div className="text-right">
                 <div className={`font-mono font-black text-2xl ${dir === 'up' ? 'flash-up' : dir === 'down' ? 'flash-down' : ''}`}
                      style={{ color: dir === 'up' ? '#00ff88' : dir === 'down' ? '#ff3356' : 'white' }}>
-                  {currentPrice.toFixed(selectedAsset.decimals)}
+                  {currentPrice != null ? currentPrice.toFixed(selectedAsset.decimals) : '—'}
                 </div>
                 <div className="text-sm font-bold"
                      style={{ color: pct >= 0 ? '#00ff88' : '#ff3356' }}>
-                  {pct >= 0 ? '+' : ''}{pct.toFixed(3)}%
+                  {currentPrice != null ? `${pct >= 0 ? '+' : ''}${pct.toFixed(3)}%` : '—'}
                 </div>
               </div>
             </div>

@@ -59,7 +59,7 @@ export default function AssetSidebar({ selectedId, onSelect, prices, pctChange }
       {/* Asset list */}
       <div className="flex-1 overflow-y-auto p-2 space-y-1">
         {filtered.map(asset => {
-          const price = prices[asset.id] ?? asset.basePrice;
+          const price = prices[asset.id];
           const pct   = pctChange(asset);
           const up    = pct >= 0;
           const active = asset.id === selectedId;
@@ -88,9 +88,9 @@ export default function AssetSidebar({ selectedId, onSelect, prices, pctChange }
                 </div>
                 {/* Price + change */}
                 <div className="text-right">
-                  <div className="text-xs font-mono font-semibold">{price.toFixed(asset.decimals)}</div>
+                  <div className="text-xs font-mono font-semibold">{price != null ? price.toFixed(asset.decimals) : '—'}</div>
                   <div className="text-xs font-mono font-bold" style={{ color: up ? '#00ff88' : '#ff3356' }}>
-                    {up ? '+' : ''}{pct.toFixed(2)}%
+                    {price != null ? `${up ? '+' : ''}${pct.toFixed(2)}%` : '—'}
                   </div>
                 </div>
               </div>

@@ -160,7 +160,7 @@ export default function Hero({ onEnter }: Props) {
             <div className="absolute inset-0 rounded-full ping-ring" style={{ background: '#00ff88' }} />
             <div className="w-2 h-2 rounded-full" style={{ background: '#00ff88' }} />
           </div>
-          LIVE ON SOLANA MAINNET — ZERO HOUSE EDGE
+          LIVE ON SOLANA DEVNET
         </div>
 
         {/* Logo */}
@@ -188,7 +188,6 @@ export default function Hero({ onEnter }: Props) {
           {[
             ['⚡', '5-second Rounds'],
             ['🔗', 'On-Chain Settlement'],
-            ['⚖️', 'No House Edge'],
             ['🔒', 'Non-Custodial'],
             ['🌐', '20+ Assets'],
             ['💎', 'Up to 195% Payout'],

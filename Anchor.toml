@@ -5,8 +5,8 @@ resolution = true
 skip-lint = false
 
 [programs.localnet]
+birex_core = "37pwz8ZyR8wZ8KteXcX6cr4oEmguL9miwPMzHGZBGELp"
 bt_token = "2Jts3AVjULjhJBsQBWHCQCRpZ4F9PX3odewcbN4hKrXi"
-birex_core = "BRXCor1111111111111111111111111111111111111"
 
 [provider]
 cluster = "localnet"

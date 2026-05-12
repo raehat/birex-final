@@ -7,7 +7,7 @@ pub use routing::instructions::settle_trade::*;
 pub use routing::instructions::trade::*;
 
 // Placeholder — replace with `anchor keys list` output after first build.
-declare_id!("BRXCor1111111111111111111111111111111111111");
+declare_id!("37pwz8ZyR8wZ8KteXcX6cr4oEmguL9miwPMzHGZBGELp");
 
 #[program]
 pub mod birex_core {

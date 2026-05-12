@@ -5,63 +5,85 @@ import { ASSETS, Asset } from '@/lib/assets';
 export type PriceMap = Record<string, number>;
 export type HistoryMap = Record<string, number[]>;
 
-const HISTORY_LEN = 120;
+const HISTORY_LEN = 60;
+const HERMES_URL = 'https://hermes.pyth.network/v2/updates/price/latest';
+const POLL_MS = 400;
 
-function randomWalk(price: number, volatility = 0.0003): number {
-  const change = price * volatility * (Math.random() - 0.495);
-  return Math.max(price + change, price * 0.5);
+async function fetchPythPrices(assets: Asset[]): Promise<Partial<PriceMap>> {
+  const withId = assets.filter(a => a.pythId);
+  if (!withId.length) return {};
+
+  const qs = withId.map(a => `ids[]=${a.pythId}`).join('&');
+  const res = await fetch(`${HERMES_URL}?${qs}&parsed=true&ignore_invalid_price_ids=true`, { cache: 'no-store' });
+  if (!res.ok) {
+    console.warn('[Pyth] fetch failed', res.status);
+    return {};
+  }
+
+  const data = await res.json();
+  const out: Partial<PriceMap> = {};
+
+  for (const entry of data.parsed ?? []) {
+    const entryId = (entry.id as string).replace(/^0x/, '').toLowerCase();
+    const asset = withId.find(a => a.pythId?.toLowerCase() === entryId);
+    if (!asset) continue;
+    const price = parseFloat(entry.price.price) * Math.pow(10, entry.price.expo);
+    if (price > 0) out[asset.id] = price;
+  }
+
+  return out;
 }
 
-export function usePrices(tickMs = 500) {
-  const [prices, setPrices] = useState<PriceMap>(() =>
-    Object.fromEntries(ASSETS.map(a => [a.id, a.basePrice]))
-  );
-  const [history, setHistory] = useState<HistoryMap>(() =>
-    Object.fromEntries(
-      ASSETS.map(a => [a.id, Array.from({ length: HISTORY_LEN }, (_, i) => {
-        let p = a.basePrice;
-        for (let j = 0; j < HISTORY_LEN - i; j++) p = randomWalk(p, 0.0004);
-        return p;
-      }).reverse()])
-    )
+export function usePrices() {
+  const [prices, setPrices] = useState<PriceMap>({});
+  const [history, setHistory] = useState<HistoryMap>(
+    Object.fromEntries(ASSETS.map(a => [a.id, []]))
   );
   const prevPrices = useRef<PriceMap>({});
+  const latestPrices = useRef<PriceMap>({});
 
   useEffect(() => {
-    const id = setInterval(() => {
-      setPrices(prev => {
-        prevPrices.current = prev;
-        const next: PriceMap = {};
-        for (const a of ASSETS) next[a.id] = randomWalk(prev[a.id], 0.0004);
-        return next;
-      });
+    let cancelled = false;
+
+    const tick = async () => {
+      const next = await fetchPythPrices(ASSETS).catch(() => ({})) as PriceMap;
+      if (cancelled) return;
+
+      prevPrices.current = latestPrices.current;
+      latestPrices.current = next;
+      setPrices(next);
+
       setHistory(prev => {
-        const next: HistoryMap = {};
+        const nextHist: HistoryMap = {};
         for (const a of ASSETS) {
-          const arr = [...prev[a.id]];
-          arr.shift();
-          arr.push(prices[a.id] ?? a.basePrice);
-          next[a.id] = arr;
+          const arr = [...(prev[a.id] ?? [])];
+          if (next[a.id] != null) {
+            if (arr.length >= HISTORY_LEN) arr.shift();
+            arr.push(next[a.id]);
+          }
+          nextHist[a.id] = arr;
         }
-        return next;
+        return nextHist;
       });
-    }, tickMs);
-    return () => clearInterval(id);
-  }, [tickMs, prices]);
+    };
+
+    tick();
+    const id = setInterval(tick, POLL_MS);
+    return () => { cancelled = true; clearInterval(id); };
+  }, []);
 
   const direction = useCallback((id: string): 'up' | 'down' | 'flat' => {
     const cur = prices[id];
     const prv = prevPrices.current[id];
-    if (!prv) return 'flat';
+    if (!cur || !prv) return 'flat';
     return cur > prv ? 'up' : cur < prv ? 'down' : 'flat';
   }, [prices]);
 
   const pctChange = useCallback((asset: Asset): number => {
     const hist = history[asset.id];
-    if (!hist || hist.length < 2) return 0;
-    const open = hist[0];
-    const cur  = prices[asset.id];
-    return ((cur - open) / open) * 100;
+    const cur = prices[asset.id];
+    if (!hist?.length || !cur) return 0;
+    return ((cur - hist[0]) / hist[0]) * 100;
   }, [history, prices]);
 
   return { prices, history, direction, pctChange };

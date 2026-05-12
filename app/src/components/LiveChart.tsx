@@ -5,7 +5,7 @@ import { Asset } from '@/lib/assets';
 interface Props {
   asset: Asset;
   history: number[];
-  currentPrice: number;
+  currentPrice: number | undefined;
   activeBet: { direction: 'up' | 'down'; entryPrice: number; expiresAt: number } | null;
 }
 
@@ -15,6 +15,13 @@ export default function LiveChart({ asset, history, currentPrice, activeBet }: P
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
+    if (currentPrice == null || history.length === 0) {
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+      return;
+    }
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
@@ -32,9 +39,13 @@ export default function LiveChart({ asset, history, currentPrice, activeBet }: P
     const data = history.filter(Boolean);
     if (data.length < 2) return;
 
-    const min = Math.min(...data) * 0.9995;
-    const max = Math.max(...data) * 1.0005;
-    const range = max - min || 1;
+    const rawMin = Math.min(...data);
+    const rawMax = Math.max(...data);
+    const dataRange = rawMax - rawMin;
+    const pad = Math.max(dataRange * 0.15, rawMin * 0.0004);
+    const min = rawMin - pad;
+    const max = rawMax + pad;
+    const range = max - min;
 
     const toX = (i: number) => PAD_L + (i / (data.length - 1)) * chartW;
     const toY = (v: number) => PAD_T + chartH - ((v - min) / range) * chartH;
@@ -139,10 +150,15 @@ export default function LiveChart({ asset, history, currentPrice, activeBet }: P
   }, [history, currentPrice, asset, activeBet]);
 
   return (
-    <canvas
-      ref={canvasRef}
-      className="w-full h-full"
-      style={{ display: 'block' }}
-    />
+    <div className="relative w-full h-full">
+      <canvas ref={canvasRef} className="w-full h-full" style={{ display: 'block' }} />
+      {(currentPrice == null || history.length === 0) && (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <span className="text-sm font-mono" style={{ color: 'rgba(255,255,255,0.3)' }}>
+            Price unavailable
+          </span>
+        </div>
+      )}
+    </div>
   );
 }
