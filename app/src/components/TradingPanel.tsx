@@ -85,21 +85,16 @@ export default function TradingPanel({ asset, currentPrice, onBet, activeBet, is
         <div className="grid grid-cols-2 gap-2">
           <div>
             <div className="text-xs font-bold tracking-wider mb-1.5" style={{ color: 'rgba(255,255,255,0.35)' }}>TIME</div>
-            <div className="flex gap-1">
+            <select
+              value={duration}
+              onChange={e => !activeBet && setDuration(Number(e.target.value))}
+              disabled={!!activeBet}
+              className="w-full py-2 px-2 rounded text-sm font-bold outline-none appearance-none"
+              style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.1)', color: 'white' }}>
               {DURATIONS.map(d => (
-                <button key={d.seconds}
-                        onClick={() => !activeBet && setDuration(d.seconds)}
-                        disabled={!!activeBet}
-                        className="flex-1 py-1.5 rounded text-xs font-bold transition-all"
-                        style={{
-                          background: duration === d.seconds && !activeBet ? 'rgba(0,255,136,0.15)' : 'rgba(255,255,255,0.05)',
-                          color: duration === d.seconds && !activeBet ? '#00ff88' : 'rgba(255,255,255,0.4)',
-                          border: `1px solid ${duration === d.seconds && !activeBet ? 'rgba(0,255,136,0.3)' : 'rgba(255,255,255,0.07)'}`,
-                        }}>
-                  {d.label}
-                </button>
+                <option key={d.seconds} value={d.seconds} style={{ background: '#0d1422' }}>{d.label}</option>
               ))}
-            </div>
+            </select>
           </div>
           <div>
             <div className="text-xs font-bold tracking-wider mb-1.5" style={{ color: 'rgba(255,255,255,0.35)' }}>AMOUNT</div>
@@ -108,21 +103,10 @@ export default function TradingPanel({ asset, currentPrice, onBet, activeBet, is
               <input type="number" value={amount}
                      onChange={e => !activeBet && setAmount(e.target.value)}
                      disabled={!!activeBet}
-                     className="w-full pl-5 pr-2 py-1.5 rounded text-sm font-mono font-bold outline-none"
-                     style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'white' }} />
+                     className="w-full pl-5 pr-2 py-2 rounded text-sm font-mono font-bold outline-none"
+                     style={{ background: 'rgba(255,255,255,0.07)', border: '1px solid rgba(255,255,255,0.1)', color: 'white' }} />
             </div>
           </div>
-        </div>
-
-        {/* Quick amounts */}
-        <div className="flex gap-1.5">
-          {[10, 25, 50, 100].map(v => (
-            <button key={v} onClick={() => !activeBet && setAmount(String(v))}
-                    className="flex-1 py-1 rounded text-xs font-semibold transition-all"
-                    style={{ background: 'rgba(255,255,255,0.05)', color: 'rgba(255,255,255,0.45)', border: '1px solid rgba(255,255,255,0.07)' }}>
-              ${v}
-            </button>
-          ))}
         </div>
 
         {/* Active bet or Payout + Buttons */}

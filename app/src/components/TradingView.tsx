@@ -76,9 +76,9 @@ export default function TradingView({ onBackToHero, isDemo, pricesData }: Props)
     <div className="flex flex-col h-screen overflow-hidden" style={{ background: 'var(--bg)' }}>
       <Navbar onLogoClick={onBackToHero} />
 
-      {/* Demo banner */}
+      {/* Demo banner — desktop only (mobile shows balance in panel) */}
       {isDemo && (
-        <div className="fixed top-14 left-0 right-0 z-40 flex items-center justify-center gap-2 px-3 py-1.5 text-xs font-bold"
+        <div className="hidden lg:flex fixed top-14 left-0 right-0 z-40 items-center justify-center gap-2 px-3 py-1.5 text-xs font-bold"
              style={{ background: 'rgba(255,180,0,0.12)', borderBottom: '1px solid rgba(255,180,0,0.25)', color: '#ffb400' }}>
           <span className="px-2 py-0.5 rounded font-black tracking-wider" style={{ background: 'rgba(255,180,0,0.2)' }}>DEMO</span>
           <span>Balance:</span>
@@ -90,12 +90,12 @@ export default function TradingView({ onBackToHero, isDemo, pricesData }: Props)
               Refill
             </button>
           )}
-          <span className="hidden sm:inline" style={{ color: 'rgba(255,180,0,0.5)' }}>· Virtual funds only</span>
+          <span style={{ color: 'rgba(255,180,0,0.5)' }}>· Virtual funds only</span>
         </div>
       )}
 
       {/* Ticker */}
-      <div className={isDemo ? 'mt-[calc(3.5rem+32px)]' : 'mt-14'}>
+      <div className={isDemo ? 'mt-14 lg:mt-[calc(3.5rem+32px)]' : 'mt-14'}>
         <MarketTicker prices={prices} pctChange={pctChange} />
       </div>
 
