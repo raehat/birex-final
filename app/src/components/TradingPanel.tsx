@@ -184,9 +184,9 @@ export default function TradingPanel({ asset, currentPrice, onBet, activeBet, is
                       strokeLinecap="round"
                       style={{ transition: 'stroke-dashoffset 0.2s linear' }} />
             </svg>
-            <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <div className="text-2xl font-black">{countdown ?? '--'}</div>
-              <div className="text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>sec</div>
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-0">
+              <div className="text-2xl font-black leading-none">{countdown ?? '--'}</div>
+              <div className="text-xs leading-none mt-0.5" style={{ color: 'rgba(255,255,255,0.4)' }}>sec</div>
             </div>
           </div>
           <div className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold"
