@@ -183,9 +183,9 @@ export default function TradingView({ onBackToHero, isDemo, pricesData }: Props)
         </div>
 
         {/* Right column */}
-        <div className="flex flex-col w-72 shrink-0 border-l overflow-hidden"
+        <div className="flex flex-col w-80 shrink-0 border-l overflow-hidden"
              style={{ borderColor: 'var(--border-subtle)' }}>
-          <div className="overflow-y-auto h-full">
+          <div className="h-full overflow-hidden">
             <TradingPanel
               asset={selectedAsset}
               currentPrice={currentPrice}
