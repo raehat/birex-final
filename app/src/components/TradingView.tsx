@@ -1,7 +1,14 @@
 'use client';
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { ASSETS, Asset } from '@/lib/assets';
-import { usePrices } from '@/hooks/usePrices';
+import { PriceMap, HistoryMap } from '@/hooks/usePrices';
+
+interface PricesData {
+  prices: PriceMap;
+  history: HistoryMap;
+  direction: (id: string) => 'up' | 'down' | 'flat';
+  pctChange: (asset: Asset) => number;
+}
 import Navbar from './Navbar';
 import MarketTicker from './MarketTicker';
 import AssetSidebar from './AssetSidebar';
@@ -20,15 +27,16 @@ interface ActiveBet {
 interface Props {
   onBackToHero: () => void;
   isDemo: boolean;
+  pricesData: PricesData;
 }
 
 const DEMO_START_BALANCE = 10_000;
 
-export default function TradingView({ onBackToHero, isDemo }: Props) {
+export default function TradingView({ onBackToHero, isDemo, pricesData }: Props) {
   const [selectedAsset, setSelectedAsset] = useState<Asset>(ASSETS[0]);
   const [activeBet, setActiveBet] = useState<ActiveBet | null>(null);
   const [demoBalance, setDemoBalance] = useState(DEMO_START_BALANCE);
-  const { prices, history, pctChange, direction } = usePrices();
+  const { prices, history, pctChange, direction } = pricesData;
 
   const currentPrice = prices[selectedAsset.id];
   const currentHistory = history[selectedAsset.id] ?? [];
