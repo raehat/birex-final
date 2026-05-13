@@ -14,7 +14,6 @@ import MarketTicker from './MarketTicker';
 import AssetSidebar from './AssetSidebar';
 import LiveChart from './LiveChart';
 import TradingPanel from './TradingPanel';
-import RecentTrades from './RecentTrades';
 
 interface ActiveBet {
   direction: 'up' | 'down';
@@ -186,7 +185,7 @@ export default function TradingView({ onBackToHero, isDemo, pricesData }: Props)
         {/* Right column */}
         <div className="flex flex-col w-72 shrink-0 border-l overflow-hidden"
              style={{ borderColor: 'var(--border-subtle)' }}>
-          <div className="shrink-0 border-b overflow-y-auto" style={{ borderColor: 'var(--border-subtle)', maxHeight: '65%' }}>
+          <div className="overflow-y-auto h-full">
             <TradingPanel
               asset={selectedAsset}
               currentPrice={currentPrice}
@@ -195,9 +194,6 @@ export default function TradingView({ onBackToHero, isDemo, pricesData }: Props)
               isDemo={isDemo}
               demoBalance={isDemo ? demoBalance : undefined}
             />
-          </div>
-          <div className="flex-1 overflow-hidden">
-            <RecentTrades />
           </div>
         </div>
       </div>
