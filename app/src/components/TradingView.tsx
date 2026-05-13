@@ -145,30 +145,8 @@ export default function TradingView({ onBackToHero, isDemo, pricesData }: Props)
             </div>
           </div>
 
-          {/* Mobile asset picker */}
-          <div className="lg:hidden flex overflow-x-auto gap-2 px-3 py-2 shrink-0"
-               style={{ borderBottom: '1px solid var(--border-subtle)' }}>
-            {ASSETS.map(a => {
-              const p = prices[a.id];
-              const ap = pctChange(a);
-              return (
-                <button key={a.id} onClick={() => handleSelectAsset(a)}
-                        className="flex flex-col items-start px-2.5 py-1.5 rounded-lg shrink-0"
-                        style={{
-                          background: selectedAsset.id === a.id ? 'rgba(0,255,136,0.1)' : 'rgba(255,255,255,0.04)',
-                          border: selectedAsset.id === a.id ? '1px solid rgba(0,255,136,0.3)' : '1px solid rgba(255,255,255,0.06)',
-                        }}>
-                  <span className="text-xs font-bold whitespace-nowrap">{a.symbol}</span>
-                  <span className="text-xs font-mono" style={{ color: ap >= 0 ? '#00ff88' : '#ff3356' }}>
-                    {p != null ? `${ap >= 0 ? '+' : ''}${ap.toFixed(2)}%` : '—'}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-
           {/* Chart canvas */}
-          <div className="flex-1 p-2 lg:p-4 overflow-hidden relative" style={{ minHeight: '180px' }}>
+          <div className="flex-1 p-2 lg:p-4 overflow-hidden relative">
             <LiveChart
               asset={selectedAsset}
               history={currentHistory}
@@ -203,7 +181,7 @@ export default function TradingView({ onBackToHero, isDemo, pricesData }: Props)
         </div>
 
         {/* Right column: trading panel */}
-        <div className="flex flex-col w-full lg:w-80 shrink-0 lg:border-l border-t lg:border-t-0 overflow-y-auto lg:overflow-hidden max-h-[38vh] lg:max-h-none"
+        <div className="flex flex-col w-full lg:w-80 shrink-0 lg:border-l border-t lg:border-t-0 lg:overflow-hidden"
              style={{ borderColor: 'var(--border-subtle)' }}>
           <TradingPanel
             asset={selectedAsset}
