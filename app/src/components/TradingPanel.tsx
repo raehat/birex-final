@@ -69,8 +69,8 @@ export default function TradingPanel({ asset, currentPrice, onBet, activeBet, is
   return (
     <div className="flex flex-col h-full p-3 lg:p-4 gap-2 lg:gap-3 overflow-hidden" style={{ background: 'var(--bg-card)' }}>
 
-      {/* Asset info */}
-      <div className="flex items-center justify-between">
+      {/* Asset info — hidden on mobile, shown in chart header */}
+      <div className="hidden lg:flex items-center justify-between">
         <div className="flex items-center gap-2.5">
           <div className="w-9 h-9 rounded-xl flex items-center justify-center text-lg"
                style={{ background: 'rgba(255,255,255,0.06)' }}>
@@ -90,7 +90,7 @@ export default function TradingPanel({ asset, currentPrice, onBet, activeBet, is
       </div>
 
       {isDemo && demoBalance != null && (
-        <div className="rounded-lg px-3 py-2 flex items-center justify-between"
+        <div className="hidden lg:flex rounded-lg px-3 py-2 items-center justify-between"
              style={{ background: 'rgba(255,180,0,0.07)', border: '1px solid rgba(255,180,0,0.2)' }}>
           <span className="text-xs font-bold tracking-widest" style={{ color: 'rgba(255,180,0,0.7)' }}>DEMO BALANCE</span>
           <span className="font-mono font-black text-sm" style={{ color: '#ffb400' }}>
@@ -99,7 +99,7 @@ export default function TradingPanel({ asset, currentPrice, onBet, activeBet, is
         </div>
       )}
 
-      <div style={{ borderTop: '1px solid var(--border-subtle)' }} />
+      <div className="hidden lg:block" style={{ borderTop: '1px solid var(--border-subtle)' }} />
 
       {/* Duration selector */}
       <div>

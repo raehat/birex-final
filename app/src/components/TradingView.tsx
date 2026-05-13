@@ -203,7 +203,7 @@ export default function TradingView({ onBackToHero, isDemo, pricesData }: Props)
         </div>
 
         {/* Right column: trading panel */}
-        <div className="flex flex-col w-full lg:w-80 shrink-0 lg:border-l border-t lg:border-t-0 overflow-y-auto lg:overflow-hidden max-h-[48vh] lg:max-h-none"
+        <div className="flex flex-col w-full lg:w-80 shrink-0 lg:border-l border-t lg:border-t-0 overflow-y-auto lg:overflow-hidden max-h-[38vh] lg:max-h-none"
              style={{ borderColor: 'var(--border-subtle)' }}>
           <TradingPanel
             asset={selectedAsset}
