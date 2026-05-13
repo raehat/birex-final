@@ -118,7 +118,7 @@ export default function TradingView({ onBackToHero, isDemo, pricesData }: Props)
             <div className="text-right">
               <div className={`font-mono font-black text-lg lg:text-2xl ${dir === 'up' ? 'flash-up' : dir === 'down' ? 'flash-down' : ''}`}
                    style={{ color: dir === 'up' ? '#00ff88' : dir === 'down' ? '#ff3356' : 'white' }}>
-                {currentPrice != null ? currentPrice.toFixed(selectedAsset.decimals) : '—'}
+                {currentPrice != null ? `$${currentPrice.toFixed(selectedAsset.decimals)}` : '—'}
               </div>
               <div className="text-xs lg:text-sm font-bold"
                    style={{ color: pct >= 0 ? '#00ff88' : '#ff3356' }}>
