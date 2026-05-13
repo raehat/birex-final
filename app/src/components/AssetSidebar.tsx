@@ -41,12 +41,13 @@ export default function AssetSidebar({ selectedId, onSelect, prices, pctChange }
       </div>
 
       {/* Category tabs */}
-      <div className="grid grid-cols-2 gap-1.5 p-3" style={{ borderBottom: '1px solid var(--border-subtle)' }}>
+      <div className="flex gap-1 px-3 py-2" style={{ borderBottom: '1px solid var(--border-subtle)' }}>
         {CATEGORIES.map(c => (
           <button key={c.id}
                   onClick={() => setCategory(c.id)}
-                  className="py-2 rounded-md text-xs font-semibold transition-all duration-150"
+                  className="flex-1 py-1.5 rounded-md font-semibold transition-all duration-150"
                   style={{
+                    fontSize: '11px',
                     background: category === c.id ? 'rgba(0,255,136,0.12)' : 'transparent',
                     color: category === c.id ? '#00ff88' : 'rgba(255,255,255,0.4)',
                     border: category === c.id ? '1px solid rgba(0,255,136,0.3)' : '1px solid transparent',
