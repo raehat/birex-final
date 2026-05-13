@@ -104,7 +104,7 @@ export default function TradingView({ onBackToHero, isDemo, pricesData }: Props)
       <div className="flex flex-1 overflow-hidden">
 
         {/* Left: asset sidebar */}
-        <div className="hidden lg:flex flex-col w-64 shrink-0 border-r"
+        <div className="hidden lg:flex flex-col w-72 shrink-0 border-r"
              style={{ borderColor: 'var(--border-subtle)', overflow: 'hidden' }}>
           <AssetSidebar
             selectedId={selectedAsset.id}

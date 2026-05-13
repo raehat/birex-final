@@ -41,11 +41,11 @@ export default function AssetSidebar({ selectedId, onSelect, prices, pctChange }
       </div>
 
       {/* Category tabs */}
-      <div className="flex gap-1 p-2" style={{ borderBottom: '1px solid var(--border-subtle)' }}>
+      <div className="flex gap-1.5 p-3" style={{ borderBottom: '1px solid var(--border-subtle)' }}>
         {CATEGORIES.map(c => (
           <button key={c.id}
                   onClick={() => setCategory(c.id)}
-                  className="flex-1 py-1.5 rounded-md text-xs font-semibold transition-all duration-150"
+                  className="flex-1 py-2 rounded-md text-xs font-semibold transition-all duration-150"
                   style={{
                     background: category === c.id ? 'rgba(0,255,136,0.12)' : 'transparent',
                     color: category === c.id ? '#00ff88' : 'rgba(255,255,255,0.4)',
@@ -57,7 +57,7 @@ export default function AssetSidebar({ selectedId, onSelect, prices, pctChange }
       </div>
 
       {/* Asset list */}
-      <div className="flex-1 overflow-y-auto p-2 space-y-1">
+      <div className="flex-1 overflow-y-auto p-3 space-y-1.5">
         {filtered.map(asset => {
           const price = prices[asset.id];
           const pct   = pctChange(asset);
