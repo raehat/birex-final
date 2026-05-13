@@ -106,7 +106,7 @@ export default function Hero({ onDemo }: Props) {
       {/* Floating asset chips */}
       {FLOATING_ASSETS.map((a, i) => (
         <div key={a.symbol}
-             className="absolute select-none pointer-events-none"
+             className="absolute select-none pointer-events-none hidden sm:block"
              style={{
                left: a.x, top: a.y, zIndex: 2,
                animation: `float-slow ${6 + i * 0.6}s ease-in-out ${a.delay}s infinite`,

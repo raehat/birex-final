@@ -67,7 +67,7 @@ export default function TradingPanel({ asset, currentPrice, onBet, activeBet, is
     : circumference;
 
   return (
-    <div className="flex flex-col h-full p-4 gap-3 overflow-hidden" style={{ background: 'var(--bg-card)' }}>
+    <div className="flex flex-col h-full p-3 lg:p-4 gap-2 lg:gap-3 overflow-hidden" style={{ background: 'var(--bg-card)' }}>
 
       {/* Asset info */}
       <div className="flex items-center justify-between">
