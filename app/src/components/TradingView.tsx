@@ -4,7 +4,7 @@ import { ASSETS, Asset } from '@/lib/assets';
 import { PriceMap, HistoryMap } from '@/hooks/usePrices';
 import Navbar from './Navbar';
 import MarketTicker from './MarketTicker';
-import AssetSidebar from './AssetSidebar';
+import AssetDropdown from './AssetDropdown';
 import LiveChart from './LiveChart';
 import TradingPanel from './TradingPanel';
 
@@ -102,37 +102,19 @@ export default function TradingView({ onBackToHero, isDemo, pricesData }: Props)
       {/* Main layout */}
       <div className="flex flex-col lg:flex-row flex-1 overflow-hidden">
 
-        {/* Left: asset sidebar — desktop only */}
-        <div className="hidden lg:flex flex-col w-72 shrink-0 border-r"
-             style={{ borderColor: 'var(--border-subtle)', overflow: 'hidden' }}>
-          <AssetSidebar
-            selectedId={selectedAsset.id}
-            onSelect={handleSelectAsset}
-            prices={prices}
-            pctChange={pctChange}
-          />
-        </div>
-
-        {/* Center: chart area */}
+        {/* Center: chart area (full width — sidebar replaced by dropdown) */}
         <div className="flex flex-col flex-1 overflow-hidden min-h-0">
 
           {/* Chart header */}
           <div className="flex items-center justify-between px-3 lg:px-5 py-2 lg:py-3 shrink-0"
                style={{ borderBottom: '1px solid var(--border-subtle)' }}>
-            <div className="flex items-center gap-2 lg:gap-3">
-              <div className="w-8 h-8 lg:w-9 lg:h-9 rounded-xl flex items-center justify-center text-base lg:text-lg"
-                   style={{ background: 'rgba(255,255,255,0.06)' }}>
-                {selectedAsset.icon}
-              </div>
-              <div>
-                <div className="font-black text-sm lg:text-base">{selectedAsset.symbol}</div>
-                <div className="text-xs hidden sm:block" style={{ color: 'rgba(255,255,255,0.4)' }}>{selectedAsset.name}</div>
-              </div>
-              <span className="hidden sm:inline px-2 py-0.5 rounded text-xs font-semibold capitalize"
-                    style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.4)' }}>
-                {selectedAsset.category}
-              </span>
-            </div>
+            <AssetDropdown
+              selected={selectedAsset}
+              onSelect={handleSelectAsset}
+              prices={prices}
+              pctChange={pctChange}
+              disabled={!!activeBet}
+            />
             <div className="text-right">
               <div className={`font-mono font-black text-lg lg:text-2xl ${dir === 'up' ? 'flash-up' : dir === 'down' ? 'flash-down' : ''}`}
                    style={{ color: dir === 'up' ? '#00ff88' : dir === 'down' ? '#ff3356' : 'white' }}>
