@@ -45,7 +45,7 @@ export default function AssetSidebar({ selectedId, onSelect, prices, pctChange }
         {CATEGORIES.map(c => (
           <button key={c.id}
                   onClick={() => setCategory(c.id)}
-                  className="flex-1 py-1.5 rounded-md font-semibold transition-all duration-150"
+                  className="flex-1 py-1.5 px-2 rounded-md font-semibold transition-all duration-150"
                   style={{
                     fontSize: '11px',
                     background: category === c.id ? 'rgba(0,255,136,0.12)' : 'transparent',
