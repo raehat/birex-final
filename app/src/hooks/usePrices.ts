@@ -8,6 +8,7 @@ export type HistoryMap = Record<string, number[]>;
 const HISTORY_LEN = 600;
 const HERMES_URL = 'https://hermes.pyth.network/v2/updates/price/latest';
 const POLL_MS = 400;
+const STORAGE_KEY = 'birex_price_history';
 
 async function fetchPythPrices(assets: Asset[]): Promise<Partial<PriceMap>> {
   const withId = assets.filter(a => a.pythId);
@@ -34,11 +35,32 @@ async function fetchPythPrices(assets: Asset[]): Promise<Partial<PriceMap>> {
   return out;
 }
 
+function loadStoredHistory(): HistoryMap {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return Object.fromEntries(ASSETS.map(a => [a.id, []]));
+    const { savedAt, history } = JSON.parse(raw) as { savedAt: number; history: HistoryMap };
+    const pointsElapsed = Math.floor((Date.now() - savedAt) / POLL_MS);
+    const result: HistoryMap = {};
+    for (const a of ASSETS) {
+      const arr = (history[a.id] ?? []) as number[];
+      result[a.id] = arr.slice(Math.min(pointsElapsed, arr.length));
+    }
+    return result;
+  } catch {
+    return Object.fromEntries(ASSETS.map(a => [a.id, []]));
+  }
+}
+
+function saveHistory(history: HistoryMap) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ savedAt: Date.now(), history }));
+  } catch {}
+}
+
 export function usePrices() {
   const [prices, setPrices] = useState<PriceMap>({});
-  const [history, setHistory] = useState<HistoryMap>(
-    Object.fromEntries(ASSETS.map(a => [a.id, []]))
-  );
+  const [history, setHistory] = useState<HistoryMap>(() => loadStoredHistory());
   const prevPrices = useRef<PriceMap>({});
   const latestPrices = useRef<PriceMap>({});
 
@@ -63,6 +85,7 @@ export function usePrices() {
           }
           nextHist[a.id] = arr;
         }
+        saveHistory(nextHist);
         return nextHist;
       });
     };
