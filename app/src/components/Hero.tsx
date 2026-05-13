@@ -5,13 +5,6 @@ interface Props {
   onDemo: () => void;
 }
 
-const STATS = [
-  { label: 'Total Volume', value: '$284M+' },
-  { label: 'Active Traders', value: '47K+' },
-  { label: 'Settled Trades', value: '2.1M+' },
-  { label: 'Max Payout', value: '195%' },
-];
-
 const FLOATING_ASSETS = [
   { symbol: 'BTC', color: '#f7931a', x: '10%', y: '20%', delay: 0 },
   { symbol: 'ETH', color: '#627eea', x: '85%', y: '15%', delay: 1.2 },
@@ -146,7 +139,7 @@ export default function Hero({ onDemo }: Props) {
             <div className="absolute inset-0 rounded-full ping-ring" style={{ background: '#00ff88' }} />
             <div className="w-2 h-2 rounded-full" style={{ background: '#00ff88' }} />
           </div>
-          LIVE ON SOLANA DEVNET
+          COMING SOON
         </div>
 
         {/* Logo */}
@@ -186,19 +179,6 @@ export default function Hero({ onDemo }: Props) {
                  }}>
               <span>{icon}</span>
               <span>{label}</span>
-            </div>
-          ))}
-        </div>
-
-        {/* Stats */}
-        <div className="fade-up-5 grid grid-cols-2 md:grid-cols-4 gap-8 mb-14 w-full max-w-2xl">
-          {STATS.map(s => (
-            <div key={s.label} className="text-center">
-              <div className="text-2xl md:text-3xl font-black mb-1"
-                   style={{ color: '#00ff88', textShadow: '0 0 20px rgba(0,255,136,0.35)' }}>
-                {s.value}
-              </div>
-              <div className="text-xs" style={{ color: 'rgba(255,255,255,0.35)' }}>{s.label}</div>
             </div>
           ))}
         </div>
