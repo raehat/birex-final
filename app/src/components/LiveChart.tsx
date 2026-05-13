@@ -242,7 +242,7 @@ export default function LiveChart({ asset, history, currentPrice, activeBet }: P
         ))}
       </div>
 
-      {(currentPrice == null || history.length === 0) && (
+      {currentPrice == null && history.length === 0 && (
         <div className="absolute inset-0 flex items-center justify-center">
           <span className="text-sm font-mono" style={{ color: 'rgba(255,255,255,0.3)' }}>
             Price unavailable

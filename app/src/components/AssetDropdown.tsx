@@ -3,21 +3,21 @@ import { useState, useRef, useEffect } from 'react';
 import { ASSETS, Asset } from '@/lib/assets';
 import { PriceMap } from '@/hooks/usePrices';
 
-type Category = 'crypto' | 'forex' | 'commodities' | 'stocks' | null;
+type Category = 'crypto' | 'forex' | 'commodity' | 'stock' | null;
 
 const CATS: { id: Category; label: string; icon: string }[] = [
-  { id: null,           label: 'All',         icon: '◉' },
-  { id: 'crypto',       label: 'Crypto',      icon: '₿' },
-  { id: 'forex',        label: 'Forex',       icon: '$' },
-  { id: 'commodities',  label: 'Commodities', icon: '◆' },
-  { id: 'stocks',       label: 'Stocks',      icon: '↗' },
+  { id: null,        label: 'All',         icon: '◉' },
+  { id: 'crypto',    label: 'Crypto',      icon: '₿' },
+  { id: 'forex',     label: 'Forex',       icon: '$' },
+  { id: 'commodity', label: 'Commodities', icon: '◆' },
+  { id: 'stock',     label: 'Stocks',      icon: '↗' },
 ];
 
 const CAT_COLOR: Record<string, string> = {
-  crypto:      '#f7931a',
-  forex:       '#627eea',
-  commodities: '#ffd700',
-  stocks:      '#00d4ff',
+  crypto:    '#f7931a',
+  forex:     '#627eea',
+  commodity: '#ffd700',
+  stock:     '#00d4ff',
 };
 
 interface Props {

@@ -27,9 +27,8 @@ export const ASSETS: Asset[] = [
   { id: 'gold',   symbol: 'XAU/USD', name: 'Gold',        category: 'commodity', icon: '🥇', decimals: 2, pythId: '765d2ba906dbc32ca17cc11f5310a89e9ee1f6420508c63861f2f8ba4ee34bb2' },
   { id: 'oil',    symbol: 'WTI/USD', name: 'Crude Oil',   category: 'commodity', icon: '🛢', decimals: 2, pythId: '0f5f9c26c12a5b8b8a7b62d5e4f8a38b70d1d4f8b8e9f4b50d5b3c6e1a0e9f2b' },
   { id: 'silver', symbol: 'XAG/USD', name: 'Silver',      category: 'commodity', icon: '🥈', decimals: 3, pythId: 'f2fb02c32b055c805e7238d628e5e9dadef274376114eb1f012337cabe93871e' },
-  { id: 'steel',  symbol: 'STEEL',   name: 'Steel',       category: 'commodity', icon: '⚙️', decimals: 2 },
   { id: 'natgas', symbol: 'NATGAS',  name: 'Natural Gas', category: 'commodity', icon: '🔥', decimals: 3, pythId: '3e49866b2da91ad918f3b3a0c1f01c98e0c50ea5f6f86d8b68e43b33d39b0c38' },
-  // Stocks
+  // Stocks (Pyth prices only available during US market hours)
   { id: 'aapl', symbol: 'AAPL', name: 'Apple',     category: 'stock', icon: '🍎', decimals: 2, pythId: '49f6b65cb1de6b10eaf75e7c03ca029c306d0357e91b5311b175084a5ad55688' },
   { id: 'tsla', symbol: 'TSLA', name: 'Tesla',     category: 'stock', icon: '⚡', decimals: 2, pythId: '16dad506d7db8da01c87581c87ca897a012a153557d4d578c3b9c9e1bc0632f1' },
   { id: 'nvda', symbol: 'NVDA', name: 'NVIDIA',    category: 'stock', icon: '🎮', decimals: 2, pythId: '8ea203ba0a820c7d5ec8b9f3ddf6a4c50bfad4d8d97c9d9dc81a8d02e1cb91f8' },
