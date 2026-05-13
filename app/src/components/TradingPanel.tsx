@@ -25,6 +25,7 @@ export default function TradingPanel({ asset, currentPrice, onBet, activeBet, is
   const [countdown, setCountdown] = useState<number | null>(null);
   const [result, setResult]       = useState<'win' | 'loss' | null>(null);
   const [resultVisible, setResultVisible] = useState(false);
+  const [insufficientVisible, setInsufficientVisible] = useState(false);
 
   const payout = 195;
   const amountNum = parseFloat(amount) || 0;
@@ -51,7 +52,11 @@ export default function TradingPanel({ asset, currentPrice, onBet, activeBet, is
 
   const handleBet = (direction: 'up' | 'down') => {
     if (activeBet || amountNum <= 0) return;
-    if (isDemo && demoBalance != null && amountNum > demoBalance) return;
+    if (isDemo && demoBalance != null && amountNum > demoBalance) {
+      setInsufficientVisible(true);
+      setTimeout(() => setInsufficientVisible(false), 2000);
+      return;
+    }
     setResult(null);
     onBet(direction, amountNum, duration);
   };
@@ -218,6 +223,19 @@ export default function TradingPanel({ asset, currentPrice, onBet, activeBet, is
             <span>DOWN</span>
             <span className="text-xs font-semibold" style={{ opacity: 0.8 }}>+{payout}%</span>
           </button>
+        </div>
+      )}
+
+      {/* Insufficient balance */}
+      {insufficientVisible && (
+        <div className="rounded-xl p-3 text-center font-bold text-sm"
+             style={{
+               background: 'rgba(255,180,0,0.1)',
+               border: '1px solid rgba(255,180,0,0.35)',
+               color: '#ffb400',
+               animation: 'fade-up 0.3s ease',
+             }}>
+          Insufficient balance
         </div>
       )}
 
