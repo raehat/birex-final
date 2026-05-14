@@ -8,6 +8,12 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 export const metadata: Metadata = {
   title: "BIREX — Peer-to-Peer Binary Trading",
   description: "Trade binary options on crypto, forex, commodities and stocks. P2P, on-chain, no house edge.",
+  metadataBase: new URL('https://www.birex.xyz'),
+  icons: {
+    icon: '/logo.svg',
+    shortcut: '/logo.svg',
+    apple: '/logo.svg',
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
