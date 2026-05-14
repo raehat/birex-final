@@ -28,7 +28,8 @@ export default function Navbar({ onLogoClick }: Props) {
       }}
     >
       {/* Logo */}
-      <button onClick={onLogoClick} className="flex items-center gap-3 focus:outline-none">
+      <button onClick={onLogoClick} className="flex items-center gap-2.5 focus:outline-none">
+        <img src="/logo.svg" alt="BIREX" className="w-8 h-8" />
         <div className="text-xl font-black tracking-widest select-none">
           <span className="text-white">BIR</span>
           <span style={{ color: '#00ff88', textShadow: '0 0 16px rgba(0,255,136,0.5)' }}>EX</span>
