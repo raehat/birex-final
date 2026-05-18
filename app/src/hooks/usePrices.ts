@@ -5,62 +5,13 @@ import { ASSETS, Asset } from '@/lib/assets';
 export type PriceMap = Record<string, number>;
 export type HistoryMap = Record<string, number[]>;
 
-const HISTORY_LEN = 600;
-const HERMES_URL = 'https://hermes.pyth.network/v2/updates/price/latest';
 const POLL_MS = 400;
-const STORAGE_KEY = 'birex_price_history';
-
-async function fetchPythPrices(assets: Asset[]): Promise<Partial<PriceMap>> {
-  const withId = assets.filter(a => a.pythId);
-  if (!withId.length) return {};
-
-  const qs = withId.map(a => `ids[]=${a.pythId}`).join('&');
-  const res = await fetch(`${HERMES_URL}?${qs}&parsed=true&ignore_invalid_price_ids=true`, { cache: 'no-store' });
-  if (!res.ok) {
-    console.warn('[Pyth] fetch failed', res.status);
-    return {};
-  }
-
-  const data = await res.json();
-  const out: Partial<PriceMap> = {};
-
-  for (const entry of data.parsed ?? []) {
-    const entryId = (entry.id as string).replace(/^0x/, '').toLowerCase();
-    const asset = withId.find(a => a.pythId?.toLowerCase() === entryId);
-    if (!asset) continue;
-    const price = parseFloat(entry.price.price) * Math.pow(10, entry.price.expo);
-    if (price > 0) out[asset.id] = price;
-  }
-
-  return out;
-}
-
-function loadStoredHistory(): HistoryMap {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return Object.fromEntries(ASSETS.map(a => [a.id, []]));
-    const { savedAt, history } = JSON.parse(raw) as { savedAt: number; history: HistoryMap };
-    const pointsElapsed = Math.floor((Date.now() - savedAt) / POLL_MS);
-    const result: HistoryMap = {};
-    for (const a of ASSETS) {
-      const arr = (history[a.id] ?? []) as number[];
-      result[a.id] = arr.slice(Math.min(pointsElapsed, arr.length));
-    }
-    return result;
-  } catch {
-    return Object.fromEntries(ASSETS.map(a => [a.id, []]));
-  }
-}
-
-function saveHistory(history: HistoryMap) {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({ savedAt: Date.now(), history }));
-  } catch {}
-}
 
 export function usePrices() {
   const [prices, setPrices] = useState<PriceMap>({});
-  const [history, setHistory] = useState<HistoryMap>(() => loadStoredHistory());
+  const [history, setHistory] = useState<HistoryMap>(() =>
+    Object.fromEntries(ASSETS.map(a => [a.id, []]))
+  );
   const prevPrices = useRef<PriceMap>({});
   const latestPrices = useRef<PriceMap>({});
 
@@ -68,26 +19,15 @@ export function usePrices() {
     let cancelled = false;
 
     const tick = async () => {
-      const next = await fetchPythPrices(ASSETS).catch(() => ({})) as PriceMap;
-      if (cancelled) return;
-
-      prevPrices.current = latestPrices.current;
-      latestPrices.current = next;
-      setPrices(next);
-
-      setHistory(prev => {
-        const nextHist: HistoryMap = {};
-        for (const a of ASSETS) {
-          const arr = [...(prev[a.id] ?? [])];
-          if (next[a.id] != null) {
-            if (arr.length >= HISTORY_LEN) arr.shift();
-            arr.push(next[a.id]);
-          }
-          nextHist[a.id] = arr;
-        }
-        saveHistory(nextHist);
-        return nextHist;
-      });
+      try {
+        const res = await fetch('/api/prices');
+        if (!res.ok || cancelled) return;
+        const data = await res.json() as { prices: PriceMap; history: HistoryMap };
+        prevPrices.current = latestPrices.current;
+        latestPrices.current = data.prices;
+        setPrices(data.prices);
+        setHistory(data.history);
+      } catch {}
     };
 
     tick();
@@ -96,7 +36,7 @@ export function usePrices() {
   }, []);
 
   const direction = useCallback((id: string): 'up' | 'down' | 'flat' => {
-    const cur = prices[id];
+    const cur = latestPrices.current[id];
     const prv = prevPrices.current[id];
     if (!cur || !prv) return 'flat';
     return cur > prv ? 'up' : cur < prv ? 'down' : 'flat';
